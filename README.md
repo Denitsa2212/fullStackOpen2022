@@ -1,0 +1,1 @@
+Repository with exercises from course Full Stack Open by University of Helsinki
