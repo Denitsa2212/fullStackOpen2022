@@ -2,38 +2,28 @@ import { useState, useEffect } from 'react'
 import PhonebookList from './components/PhonebookList';
 import Input from './components/Input';
 import PersonsForm from './components/PersonsForm';
-import axios from 'axios'
+import axios from 'axios';
+import PersonsService from './services/PersonsService';
 
 const App = () => {
-
+  const baseUrl = 'http://localhost:3001/persons';
   // States
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [filteredList, setFilteredList] = useState(persons);
 
-  // Effect
+  //Return data from json server
   useEffect(() => {
-    console.log('effect')
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        console.log('promise fulfilled')
-        setPersons(response.data)
-        setFilteredList(response.data)
-      })
+  PersonsService
+    .getAll()
+    .then(returnedData => {
+      setPersons(returnedData)
+      setFilteredList(returnedData)
+    })
   }, [])
-
-  console.log('render', persons.length, 'people')
-  console.log(persons);
-
-  const handleNameChange = (event) => {
-    setNewName(event.target.value);
-  }
-  const handleNumberChange = (event) => {
-    setNewNumber(event.target.value);
-  }
-
+  
+  //Posting a new entry
   const handleSubmit = (event) => {
     event.preventDefault();
     const repeatingName = persons.filter(person => newName === person.name);
@@ -43,20 +33,34 @@ const App = () => {
         number: newNumber,
         id: persons.length + 1
       }
-      setPersons(persons.concat(newObj));
-      setFilteredList(filteredList.concat(newObj));
-      setNewName('')
-      setNewNumber('')
-    }else {
+      PersonsService
+        .create(newObj)
+        .then(newData => {
+          setPersons(persons.concat(newData));
+          setFilteredList(persons.concat(newData));
+          setNewName('');
+          setNewNumber('');
+        })
+    }
+    else {
       alert(`${newName} is already added to phonebook`);
       setNewName('')
       setNewNumber('')
     }
   }
 
+  //Handle inputs' change
+  const handleNameChange = (event) => {
+    setNewName(event.target.value);
+  }
+  const handleNumberChange = (event) => {
+    setNewNumber(event.target.value);
+  }
+  
+
   const handleFilter = (event) => {
     let filter = (event.target.value);
-    if(filter != ''){
+    if(filter !== ''){
       setFilteredList(persons.filter(person => (person.name).toLowerCase().includes(filter.toLowerCase()))); 
     }else setFilteredList(persons)
     
