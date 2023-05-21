@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
-import Phonebook from './components/PhoneBook';
+import PhoneBook from './components/PhoneBook';
 import Input from './components/Input';
 import PersonsForm from './components/PersonsForm';
 import PersonsService from './services/PersonsService';
+import Notification from './components/Notification';
+
 
 const App = () => {
   // States
@@ -10,6 +12,8 @@ const App = () => {
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [filteredList, setFilteredList] = useState(persons);
+  const [errorMessage, setErrorMessage] = useState('')
+  const [status, setStatus] = useState(null)
 
   //Return data from json server
   useEffect(() => {
@@ -37,6 +41,11 @@ const App = () => {
           setFilteredList(persons.concat(newData));
           setNewName('');
           setNewNumber('');
+          setStatus(true);
+          setErrorMessage(`Added ${newData.name}`);
+          setTimeout(() => {
+            setStatus(null);
+          }, 2500)
         })
         .catch(err => {alert(err.message)})
     }
@@ -56,7 +65,11 @@ const App = () => {
             setNewName('');
             setNewNumber('');
           })
-          .catch(err => {alert(err.message)})
+          .catch(err => {
+            // alert(err.message)
+            setErrorMessage(`Informtion of ${changedPerson.name} has alredy been removed from server`)
+            setStatus(false)
+          })
       }
     }
   }
@@ -87,10 +100,10 @@ const App = () => {
     }else setFilteredList(persons)
     
   }
-  
   return (
-    <div>
+    <div className="app">
       <h2>Phonebook</h2>
+      <Notification message={errorMessage} status={status}/>
       <Input changeHandler={handleFilter} label="Filter by name: "/>
       <PersonsForm submitHandler={handleSubmit}>
           <Input value={newName} changeHandler={handleNameChange} label="name:"/>
@@ -98,9 +111,9 @@ const App = () => {
       </PersonsForm>
       <h2>Numbers</h2>
       {filteredList.map(person => 
-                <>
-                <Phonebook person={person} key={person.id} deleteFunc={() => handleDelete(person.id, person.name)}/>
-                </>
+                <ul>
+                <PhoneBook person={person} key={person.id} deleteFunc={() => handleDelete(person.id, person.name)}/>
+                </ul>
             )}
     </div>
   )

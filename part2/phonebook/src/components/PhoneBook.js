@@ -4,7 +4,7 @@ const PhoneBook = ({person, deleteFunc}) => {
     return (
         <div>
             <>
-                <p> {person.name} {person.number} <button onClick={deleteFunc}>delete</button></p>
+                <li className="phoneBook"> {person.name} {person.number} <button onClick={deleteFunc}>delete</button></li>
                 
                 </>
         </div>
