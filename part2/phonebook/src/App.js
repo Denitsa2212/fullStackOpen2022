@@ -69,6 +69,9 @@ const App = () => {
             // alert(err.message)
             setErrorMessage(`Informtion of ${changedPerson.name} has alredy been removed from server`)
             setStatus(false)
+            setTimeout(() => {
+              setStatus(null);
+            }, 2500)
           })
       }
     }
